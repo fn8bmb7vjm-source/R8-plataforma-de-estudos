@@ -355,16 +355,21 @@ async function handleReturn(){
 sb.auth.onAuthStateChange(async(event,session)=>{
   if(event==='TOKEN_REFRESHED') return;
   if(event==='SIGNED_OUT'){ showScreen('scLand'); return; }
+  // Only handle payment return callbacks automatically
   if(event==='INITIAL_SESSION'||event==='SIGNED_IN'){
-    if(!session){ showScreen('scLand'); return; }
-    const handled=await handleReturn();
-    if(!handled) await checkAccess(session.user,session.access_token);
+    if(!session) return;
+    const p=new URLSearchParams(location.search);
+    if(p.get('ps')){
+      await handleReturn();
+    }
+    // Do NOT auto-redirect - user must click CTA
   }
 });
 
 (async()=>{
   const p=new URLSearchParams(location.search);
   if(p.get('ps')){ showLoad('Processando...'); return; }
+  // Always show landing page first
   showScreen('scLand');
 })();
 </script>
