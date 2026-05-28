@@ -1099,6 +1099,13 @@ async function doLogin(){
   const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){hideLoad();err.textContent='E-mail ou senha incorretos.';return;}
   hideLoad();
+  // Admin bypass direto no login
+  if(email==='admin@r8concursos.com'){
+    window.R8_USER={...data.user,full_name:'Administrador R8',name:'Administrador R8',color:'#c9a84c',role:'admin'};
+    window.R8_SESSION_TOKEN=data.session?.access_token;
+    showScreen('scPlan');
+    return;
+  }
   await checkAccess(data.user,data.session?.access_token);
 }
 
