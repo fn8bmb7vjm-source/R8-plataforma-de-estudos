@@ -1130,6 +1130,17 @@ async function createTrial(userId,token){
 async function checkAccess(user,token){
   showLoad('Verificando acesso...');
   const t=token||(await sb.auth.getSession()).data.session?.access_token;
+  
+  // Admin bypass — acesso total sem pagamento
+  const ADMIN_EMAIL = 'admin@r8concursos.com';
+  if(user.email === ADMIN_EMAIL){
+    hideLoad();
+    window.R8_USER={...user,full_name:'Administrador R8',name:'Administrador R8',color:'#c9a84c',role:'admin'};
+    window.R8_SESSION_TOKEN=t;
+    showScreen('scPlan');
+    return;
+  }
+  
   try{
     const r=await fetch('https://uofgfvwghbhapimepwng.supabase.co/rest/v1/subscriptions?user_id=eq.'+user.id+'&select=*',
       {headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZmdmdndnaGJoYXBpbWVwd25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2Njg3ODQsImV4cCI6MjA5NTI0NDc4NH0.RZhrt16AIwIg3PDT3n38q4tSvG6jhoppQb-_-Omw358','Authorization':'Bearer '+t}});
